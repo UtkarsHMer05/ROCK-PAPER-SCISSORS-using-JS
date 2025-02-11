@@ -6,19 +6,49 @@ let score = JSON.parse(localStorage.getItem('score')) || {
 
 updateScoreElement();
 
-/*
-if (!score) {
-  score = {
-    wins: 0,
-    losses: 0,
-    ties: 0
-  };
+let isAutoPlay = false;
+let intervalId;
+
+function autoPlay() {
+    if (!isAutoPlay) {
+        intervalId = setInterval(() => {
+            const playerMove = pickComputerMove();
+            playGame(playerMove);
+        }, 1000);
+        isAutoPlay = true;
+    } else {
+        clearInterval(intervalId);
+        isAutoPlay = false;
+    }
 }
-*/
+
+document.querySelector('.js-rock-button').addEventListener('click', () => {
+    playGame('rock');
+});
+document.querySelector('.js-paper-button').addEventListener('click', () => {
+    playGame('paper');
+});
+document.querySelector('.js-scissors-button').addEventListener('click', () => {
+    playGame('scissors');
+});
+
+document.body.addEventListener('keydown', (event) => {
+    const key = event.key.toLowerCase();
+    if (key === 'r') {
+        playGame('rock');
+    } else if (key === 'p') {
+        playGame('paper');
+    } else if (key === 's') {
+        playGame('scissors');
+    } else if (key === 'a') {
+        autoPlay();
+    } else {
+        console.log('Invalid key');
+    }
+});
 
 function playGame(playerMove) {
     const computerMove = pickComputerMove();
-
     let result = '';
 
     if (playerMove === 'scissors') {
@@ -29,7 +59,6 @@ function playGame(playerMove) {
         } else if (computerMove === 'scissors') {
             result = 'Tie.';
         }
-
     } else if (playerMove === 'paper') {
         if (computerMove === 'rock') {
             result = 'You win.';
@@ -38,7 +67,6 @@ function playGame(playerMove) {
         } else if (computerMove === 'scissors') {
             result = 'You lose.';
         }
-
     } else if (playerMove === 'rock') {
         if (computerMove === 'rock') {
             result = 'Tie.';
@@ -58,7 +86,6 @@ function playGame(playerMove) {
     }
 
     localStorage.setItem('score', JSON.stringify(score));
-
     updateScoreElement();
 
     document.querySelector('.js-result').innerHTML = result;
@@ -70,13 +97,11 @@ Computer`;
 }
 
 function updateScoreElement() {
-    document.querySelector('.js-score')
-        .innerHTML = `Wins: ${score.wins}, Losses: ${score.losses}, Ties: ${score.ties}`;
+    document.querySelector('.js-score').innerHTML = `Wins: ${score.wins}, Losses: ${score.losses}, Ties: ${score.ties}`;
 }
 
 function pickComputerMove() {
     const randomNumber = Math.random();
-
     let computerMove = '';
 
     if (randomNumber >= 0 && randomNumber < 1 / 3) {
